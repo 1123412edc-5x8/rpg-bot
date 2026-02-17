@@ -1,66 +1,66 @@
 {
-      "blacksmith": {
-          "name": "符文鐵匠",
-              "emoji": "<:Runesmith:1473187538614511968>",
-                  "type": "創造",
-                      "desc": "打造帶有魔力的武具，強化裝備機率上升。",
-                          "next_tier": "holy_smith",
-                              "req_level": 10
-                                },
-                                  "holy_smith": {
-                                      "name": "聖域鑄劍師",
-                                          "emoji": "✨",
-                                              "type": "創造",
-                                                  "desc": "觸及神之領域的鍛造大師。",
-                                                      "next_tier": null,
-                                                          "req_level": 99
-                                                            },
-                                                              "appraiser": {
-                                                                  "name": "遺蹟鑑定家",
-                                                                      "emoji": "<:Archaeologist:1473187536540143636>",
-                                                                          "type": "創造",
-                                                                              "desc": "能看見古物的靈魂，鑑定出史詩寶物機率上升。",
-                                                                                  "next_tier": "truth_seeker",
-                                                                                      "req_level": 10
-                                                                                        },
-                                                                                          "truth_seeker": {
-                                                                                              "name": "真理追求者",
-                                                                                                  "emoji": "👁️",
-                                                                                                      "type": "創造",
-                                                                                                          "desc": "洞悉世間一切事物的真理。",
-                                                                                                              "next_tier": null,
-                                                                                                                  "req_level": 99
-                                                                                                                    },
-                                                                                                                      "mechanic": {
-                                                                                                                          "name": "機關師",
-                                                                                                                              "emoji": "⚙️",
-                                                                                                                                  "type": "創造",
-                                                                                                                                      "desc": "能製作自動砲塔。",
-                                                                                                                                          "next_tier": null,
-                                                                                                                                              "req_level": 10
-                                                                                                                                                },
-                                                                                                                                                  "alchemist": {
-                                                                                                                                                      "name": "荒野煉金師",
-                                                                                                                                                          "emoji": "<:WildernessAlchemist:1473187532253691995>",
-                                                                                                                                                              "type": "知識",
-                                                                                                                                                                  "desc": "藥水效果翻倍。",
-                                                                                                                                                                      "next_tier": null,
-                                                                                                                                                                          "req_level": 10
-                                                                                                                                                                            },
-                                                                                                                                                                              "chef": {
-                                                                                                                                                                                  "name": "靈魂廚師",
-                                                                                                                                                                                      "emoji": "🍳",
-                                                                                                                                                                                          "type": "知識",
-                                                                                                                                                                                              "desc": "料理提供永久 HP 加成。",
-                                                                                                                                                                                                  "next_tier": null,
-                                                                                                                                                                                                      "req_level": 10
-                                                                                                                                                                                                        },
-                                                                                                                                                                                                          "bard": {
-                                                                                                                                                                                                              "name": "吟遊詩人",
-                                                                                                                                                                                                                  "emoji": "🪕",
-                                                                                                                                                                                                                      "type": "特殊",
-                                                                                                                                                                                                                          "desc": "商店購物打八折。",
-                                                                                                                                                                                                                              "next_tier": null,
-                                                                                                                                                                                                                                  "req_level": 10
-                                                                                                                                                                                                                                    }
-                                                                                                                                                                                                                                    }
+  "blacksmith": {
+    "name": "符文鐵匠",
+    "emoji": "<:Runesmith:1473198401473613835>",
+    "type": "創造",
+    "desc": "打造帶有魔力的武具，強化裝備機率上升。",
+    "next_tier": "holy_smith",
+    "req_level": 10
+  },
+  "holy_smith": {
+    "name": "聖域鑄劍師",
+    "emoji": "✨",
+    "type": "創造",
+    "desc": "觸及神之領域的鍛造大師。",
+    "next_tier": null,
+    "req_level": 99
+  },
+  "appraiser": {
+    "name": "遺蹟鑑定家",
+    "emoji": "<:Archaeologist:1473198398612963430>",
+    "type": "創造",
+    "desc": "能看見古物的靈魂，鑑定出史詩寶物機率上升。",
+    "next_tier": "truth_seeker",
+    "req_level": 10
+  },
+  "truth_seeker": {
+    "name": "真理追求者",
+    "emoji": "👁️",
+    "type": "創造",
+    "desc": "洞悉世間一切事物的真理。",
+    "next_tier": null,
+    "req_level": 99
+  },
+  "mechanic": {
+    "name": "機關師",
+    "emoji": "⚙️",
+    "type": "創造",
+    "desc": "能製作自動砲塔。",
+    "next_tier": null,
+    "req_level": 10
+  },
+  "alchemist": {
+    "name": "荒野煉金師",
+    "emoji": "<:WildernessAlchemist:1473198406703775845>",
+    "type": "知識",
+    "desc": "藥水效果翻倍。",
+    "next_tier": null,
+    "req_level": 10
+  },
+  "chef": {
+    "name": "靈魂廚師",
+    "emoji": "🍳",
+    "type": "知識",
+    "desc": "料理提供永久 HP 加成。",
+    "next_tier": null,
+    "req_level": 10
+  },
+  "bard": {
+    "name": "吟遊詩人",
+    "emoji": "🪕",
+    "type": "特殊",
+    "desc": "商店購物打八折。",
+    "next_tier": null,
+    "req_level": 10
+  }
+}
