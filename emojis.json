@@ -1,14 +1,19 @@
 {
   "stats": {
-    "exp": "<:EXP:1473198394678706276>",
-    "gold": "<:Gold:1473198404992503891>",
-    "energy": "<:energy:1473198403285422142>",
-    "hp": "<:HP:1473198408272707721>"
+    "exp": "<:EXP:1473204783346221251>",
+    "gold": "<:gold:1473204793785712712>",
+    "energy": "<:energy:1473204791680438315>",
+    "hp": "<:HP:1473204797719973898>"
   },
-  "jobs": {
-    "blacksmith": "<:Runesmith:1473198401473613835>",
-    "appraiser": "<:Archaeologist:1473198398612963430>",
-    "assassin": "<:ShadowBlade:1473198396129935400>",
-    "alchemist": "<:WildernessAlchemist:1473198406703775845>"
+  "ui": {
+    "backpack": "🎒",
+    "search": "🔍",
+    "box": "📦",
+    "locked": "🔒"
+  },
+  "items": {
+    "common_box": "📦",
+    "rare_box": "💼",
+    "legendary_box": "💎"
   }
 }

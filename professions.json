@@ -1,7 +1,7 @@
 {
   "blacksmith": {
     "name": "符文鐵匠",
-    "emoji": "<:Runesmith:1473198401473613835>",
+    "emoji": "<:Runesmith:1473204789570568286>",
     "type": "創造",
     "desc": "打造帶有魔力的武具，強化裝備機率上升。",
     "next_tier": "holy_smith",
@@ -17,7 +17,7 @@
   },
   "appraiser": {
     "name": "遺蹟鑑定家",
-    "emoji": "<:Archaeologist:1473198398612963430>",
+    "emoji": "<:Archaeologist:1473204787473285212>",
     "type": "創造",
     "desc": "能看見古物的靈魂，鑑定出史詩寶物機率上升。",
     "next_tier": "truth_seeker",
@@ -31,6 +31,14 @@
     "next_tier": null,
     "req_level": 99
   },
+  "assassin": {
+    "name": "影刃",
+    "emoji": "<:ShadowBlade:1473204785267081340>",
+    "type": "特殊",
+    "desc": "隱藏在陰影中，擁有極高的暴擊率。",
+    "next_tier": null,
+    "req_level": 10
+  },
   "mechanic": {
     "name": "機關師",
     "emoji": "⚙️",
@@ -41,7 +49,7 @@
   },
   "alchemist": {
     "name": "荒野煉金師",
-    "emoji": "<:WildernessAlchemist:1473198406703775845>",
+    "emoji": "<:WildernessAlchemist:1473204795925073942>",
     "type": "知識",
     "desc": "藥水效果翻倍。",
     "next_tier": null,
