@@ -6,13 +6,25 @@ module.exports = {
         const args = message.content.split(' ');
         const mode = args[1] === 'lv' ? 'LEVEL' : 'ATK';
 
-        // 數據庫定義 (需與 stats.js 同步)
-        const weaponBase = { "生鏽的短劍": 10, "【精良】探險家短弓": 45, "【史詩】符文重錘": 150, "【傳說】亞特蘭提斯之鋒": 500 };
+        const weaponBase = { "生鏽的短劍": 10, "【精良】探險家長弓": 45, "【史詩】符文重錘": 150, "【傳說】亞特蘭提斯之鋒": 500 };
         const gemValues = { "紅寶石": 150, "黃寶石": 50 };
 
-        let leaderboard = Object.keys(players).map(id => {
+        // 🌟 使用 Promise.all 處理非同步名稱抓取
+        let leaderboard = await Promise.all(Object.keys(players).map(async (id) => {
             const user = players[id];
             
+            // 🔍 嘗試抓取 Discord 名稱
+            // 先找快取，找不到就用 fetch，最後才用 "未知勇者"
+            let displayName = user.name;
+            if (!displayName) {
+                try {
+                    const discordUser = await message.client.users.fetch(id);
+                    displayName = discordUser.username;
+                } catch (e) {
+                    displayName = "遺蹟冒險者";
+                }
+            }
+
             // 1. 基礎攻擊
             let baseAtk = (user.level || 1) * 15;
             
@@ -25,11 +37,10 @@ module.exports = {
                     const lv = parseInt(user.equipment.weapon.split('+')[1]);
                     gearAtk = Math.floor(gearAtk * (1 + lv * 0.5));
                 }
-                // 耐久度歸零則裝備加成失效
                 if (user.equipment.durability?.weapon <= 0) gearAtk = 0;
             }
 
-            // 3. 🌟 寶石加成 (新加入)
+            // 3. 寶石加成
             let gemAtk = 0;
             if (user.equipment?.slots?.weapon) {
                 user.equipment.slots.weapon.forEach(gem => {
@@ -37,18 +48,17 @@ module.exports = {
                 });
             }
 
-            // 4. 計算初步總計與職業修正
             let finalAtk = baseAtk + gearAtk + gemAtk;
             if (user.job === "影刃") finalAtk = Math.floor(finalAtk * 1.2);
-            if (user.job === "⚔️ 狂戰士") finalAtk = Math.floor(finalAtk * 1.5); // 之前的狂戰士設定
+            if (user.job === "⚔️ 狂戰士") finalAtk = Math.floor(finalAtk * 1.5);
 
             return {
-                name: user.name || "未知勇者",
+                name: displayName,
                 level: user.level || 1,
                 exp: user.exp || 0,
                 totalAtk: finalAtk
             };
-        });
+        }));
 
         let title = "";
         let desc = "";
