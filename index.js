@@ -64,5 +64,18 @@ client.on('messageCreate', async message => {
         message.reply('❌ 執行指令時發生錯誤！');
     }
 });
+// --- 自動備份系統 (每 60 分鐘一次) ---
+const path = require('path');
 
+setInterval(() => {
+    const date = new Date();
+    const timestamp = `${date.getHours()}時`;
+    const backupPath = `./backups/auto_backup_${timestamp}.json`;
+
+    if (fs.existsSync('./players.json')) {
+        fs.copyFileSync('./players.json', backupPath);
+        console.log(`[系統] 已完成每小時自動備份: ${timestamp}`);
+    }
+}, 60 * 60 * 1000); 
+// ------------------------------------
 client.login(process.env.DISCORD_TOKEN);
