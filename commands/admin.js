@@ -5,7 +5,7 @@ module.exports = {
         aliases: ['gm', '管理'],
             async execute(message, args, p, players) {
                     // 🔒 權限檢查：請務必把 '你的ID' 換成你真正的 Discord ID
-                            const adminIDs = ['你的ID']; 
+                            const adminIDs = ['1292424394957918248']; 
                                     if (!adminIDs.includes(message.author.id)) {
                                                 return message.reply("🚫 權限不足，無法干涉世界法則。");
                                                         }
