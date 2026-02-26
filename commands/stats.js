@@ -27,32 +27,35 @@ module.exports = {
         const maxHp = stats.maxHp || 100;
         const powerScore = Math.floor(atk + def + (maxHp / 10));
 
-        // 5. 製作專業 Embed
+        // 5. 製作專業 Embed (視覺強化版)
         const statsEmbed = new EmbedBuilder()
-            .setColor(0x2B2D31) // Discord 質感深灰
-            .setTitle(`👤 玩家個人檔案：${message.author.username}`)
+            .setColor(0xFFA500) // 換成橘金色，等級感更強
+            .setTitle(`👤 **${message.author.username}** 的冒險者檔案`)
             .setThumbnail(message.author.displayAvatarURL())
             .addFields(
-                { name: '🔰 等級', value: `\`Lv.${p.level || 1}\` (${p.exp || 0}/${(p.level || 1) * 100} EXP)`, inline: true },
-                { name: '⚔️ 職業', value: `\`${jobDisplay}\``, inline: true },
-                { name: '🏆 綜合戰力', value: `\`⚡ ${powerScore.toLocaleString()}\``, inline: true }
+                // 第一行：等級、職業、戰力 (最核心資訊)
+                { name: '🔰 等級', value: `**Lv.${p.level || 1}**`, inline: true },
+                { name: '⚔️ 職業', value: `**${jobDisplay}**`, inline: true },
+                { name: '🏆 戰力', value: `⚡ **${powerScore.toLocaleString()}**`, inline: true }
             )
             .addFields(
-                { name: '❤️ 生命值', value: `${hpBar} \`${p.hp || 0} / ${maxHp}\``, inline: false },
-                { name: '🗡️ 攻擊力', value: `\`${atk}\``, inline: true },
-                { name: '🛡️ 防禦力', value: `\`${def}\``, inline: true },
-                { name: '💰 持金量', value: `\`$ ${(p.money || 0).toLocaleString()}\``, inline: true }
+                { name: '📊 經驗進度', value: `\`${p.exp || 0} / ${(p.level || 1) * 100}\` EXP`, inline: false },
+                { name: '❤️ 生命值狀態', value: `${hpBar}\n**${p.hp || 0} / ${maxHp}**`, inline: false }
+            )
+            .addFields(
+                // 第二行：基礎屬性
+                { name: '🗡️ 攻擊力', value: `**${atk}**`, inline: true },
+                { name: '🛡️ 防禦力', value: `**${def}**`, inline: true },
+                { name: '💰 金幣', value: `**$${(p.money || 0).toLocaleString()}**`, inline: true }
             )
             .addFields(
                 { 
                     name: '🛡️ 當前武裝', 
-                    value: `> 🗡️ **武器**: ${p.equipment?.weapon?.name || "*未裝備*"}\n> 👕 **護甲**: ${p.equipment?.armor?.name || "*未裝備*"}\n> 🎓 **頭盔**: ${p.equipment?.head?.name || "*未裝備*"}\n> 👞 **靴子**: ${p.equipment?.boots?.name || "*未裝備*"}`,
+                    value: `> 🗡️ **武器**: ${p.equipment?.weapon?.name || "無"}\n> 👕 **護甲**: ${p.equipment?.armor?.name || "無"}\n> 🎓 **頭盔**: ${p.equipment?.head?.name || "無"}\n> 👞 **靴子**: ${p.equipment?.boots?.name || "無"}`,
                     inline: false 
                 }
             )
-            .setFooter({ text: '提示：使用 ~dungeon 挑戰副本獲取稀有零件！' })
-            .setTimestamp();
-
-        return message.reply({ embeds: [statsEmbed] });
-    }
-};
+            .setFooter({ text: '提示：等級越高，能挑戰的副本就越深！' })
+            .setTimestamp()
+        }
+    };
