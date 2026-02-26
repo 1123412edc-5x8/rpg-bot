@@ -92,7 +92,7 @@ module.exports = {
                 { name: "🔋 剩餘體力", value: `⚡ **${p.energy}** / ${maxEnergy}`, inline: true }
             )
             .addFields(
-                { name: "🎁 獲得戰利品", value: lootResults.map(i => `📦 \`${i}\``).join('  ') || "✨ 這次什麼都沒發現", inline: false }
+                { name: "🎁 獲得戰利品", value: lootResults.map(i => ` \`${i}\``).join('  ') || "✨ 這次什麼都沒發現", inline: false }
             )
             .setFooter({ text: `耗費了 ${map.cost} 點體力 | 繼續變強吧！` })
             .setTimestamp();
