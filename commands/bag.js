@@ -35,7 +35,7 @@ module.exports = {
                     const count = p.inventory[name] || 0;
                     if (count > 0) content += `**${name}** × \`${count}\`\n`;
                 });
-                embed.setDescription(`### 📦 戰利品分區 - ${currentSubCategory}\n${content || "*目前沒有此類材料*"}`);
+                embed.setDescription(`###  戰利品分區 - ${currentSubCategory}\n${content || "*目前沒有此類材料*"}`);
                 embed.setFooter({ text: "切換上方選單來查看裝備或其他分類" });
             } else {
                 const eq = p.equipment[currentEquipSlot];
