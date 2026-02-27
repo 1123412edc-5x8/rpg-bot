@@ -65,5 +65,4 @@ const client = new Client({
                                                                                                                                                                                                                                     message.reply('❌ 執行指令時發生錯誤！');
                                                                                                                                                                                                                                         }
                                                                                                                                                                                                                                         });
-
-                                                                                                                                                                                                                                        client.login(process.env.DISCORD_TOKEN);
+  client.login(process.env.DISCORD_TOKEN);
