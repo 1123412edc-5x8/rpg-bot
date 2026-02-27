@@ -66,4 +66,4 @@ const client = new Client({
                                                                                                                                                                                                                                         }
                                                                                                                                                                                                                                         });
 
-                                                                                                                                                                                                                                        client.login(pocess.env.DISCORD_TOKEN);
+                                                                                                                                                                                                                                        client.login(process.env.DISCORD_TOKEN);
