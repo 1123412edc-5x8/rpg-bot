@@ -1,30 +1,40 @@
 const { qualities, tiers, parts, weaponTypes } = require('../utils/equipData.js');
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
-const path = require('path'); // 引入路徑模組
+const path = require('path');
 
 module.exports = {
     name: 'craft',
     aliases: ['合成', 'hc', 'make'],
     async execute(message, args, p, players) {
-        
+
+        // 🚨 安全檢查：防止 tiers 未定義導致崩潰
+        if (!tiers || typeof tiers !== 'object') {
+            return message.reply("❌ **系統錯誤**：無法讀取合成數據 (tiers)，請檢查 `utils/equipData.js` 是否導出正確。");
+        }
+
         // 輔助函數：去除 Emoji 方便比對
         const clean = (str) => str ? str.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, "").trim() : "";
 
         // --- 1. 主動顯示合成清單 ---
         if (!args[0]) {
             let recipeList = "";
-            for (const [lv, tier] of Object.entries(tiers)) {
-                recipeList += `⭐ **Lv.${lv} 系列**：\`${tier.name}\`\n`;
-                recipeList += `🔹 需要：\`${tier.material}\` x10 + \`${tier.sub}\` x5\n`;
-                recipeList += `💰 費用：\`$${lv * 100}\`\n\n`;
+            // 使用 try-catch 防止 Object.entries 噴錯
+            try {
+                for (const [lv, tier] of Object.entries(tiers)) {
+                    recipeList += `⭐ **Lv.${lv} 系列**：\`${tier.name}\`\n`;
+                    recipeList += `🔹 需要：\`${tier.material}\` x10 + \`${tier.sub}\` x5\n`;
+                    recipeList += `💰 費用：\`$${lv * 100}\`\n\n`;
+                }
+            } catch (err) {
+                return message.reply("❌ **顯示清單失敗**：數據格式異常。");
             }
 
             const helpEmbed = new EmbedBuilder()
                 .setColor(0x3498DB)
                 .setTitle("🔨 | 裝備合成工坊")
-                .setDescription("請輸入等級與部位進行製作\n用法：`~hc [等級] [部位]`\n例：`~hc 10 劍`、`~hc 30 鞋`\n\n" + recipeList)
-                .setFooter({ text: "部位支援：劍、弓、矛、頭盔、護甲、靴子" });
+                .setDescription("請輸入等級與部位進行製作\n用法：`~hc [等級] [部位]`\n例：`~hc 10 劍`、`~hc 30 鞋`\n\n" + (recipeList || "暫無配方"))
+                .setFooter({ text: "部位支援：劍、弓、矛、頭、甲、鞋" });
 
             return message.reply({ embeds: [helpEmbed] });
         }
@@ -34,13 +44,13 @@ module.exports = {
         const typeInput = args[1];
 
         if (!lv || !typeInput || !tiers[lv]) {
-            return message.reply("❌ **辨識失敗！** 請輸入正確的等級 (10/30/50...) 與部位。");
+            return message.reply(`❌ **辨識失敗！** 請輸入正確的等級 (${Object.keys(tiers).join('/')}) 與部位。`);
         }
 
         let part = "";
         let type = typeInput;
 
-        // 擴充識別清單
+        // 擴大識別範圍
         if (['劍', '弓', '矛'].includes(typeInput)) {
             part = "weapon";
         } else if (['頭', '頭盔', '頂'].includes(typeInput)) {
@@ -59,15 +69,13 @@ module.exports = {
         const tier = tiers[lv];
         const recipeCost = lv * 100;
 
-        // --- 3. 條件檢查 (加入智能匹配) ---
+        // --- 3. 條件檢查 ---
         if (p.level < lv) return message.reply(`❌ **等級不足！** 你需要 Lv.${lv}。`);
         if (p.money < recipeCost) return message.reply(`❌ **金幣不足！** 需要 \`$${recipeCost}\`。`);
-        
-        // 💡 關鍵修復：從背包找東西時，同時找「帶圖示」跟「沒圖示」的名字
+
         const findInInv = (name) => {
             const pure = clean(name);
-            // 優先找原名，找不到找去圖標名，再找不到回傳 0
-            return p.inventory[name] || p.inventory[pure] || 0;
+            return (p.inventory[name] || p.inventory[pure] || 0);
         };
 
         const hasMain = findInInv(tier.material);
@@ -105,16 +113,16 @@ module.exports = {
         // --- 6. 扣除與發放 ---
         p.money -= recipeCost;
         
-        // 扣除材料邏輯：優先扣除背包裡有的那個鍵名
+        // 扣除函數：確保有 Emoji 或沒 Emoji 都能扣到
         const deduct = (name, amount) => {
             if (p.inventory[name] >= amount) p.inventory[name] -= amount;
             else p.inventory[clean(name)] -= amount;
         };
         deduct(tier.material, 10);
         deduct(tier.sub, 5);
-        
+
         const itemName = `${qInfo.label} ${tier.name}${weaponLabel || parts[part].name}`;
-        
+
         p.equipment = p.equipment || {};
         p.equipment[part] = {
             name: itemName,
@@ -127,7 +135,7 @@ module.exports = {
         players[message.author.id] = p;
         fs.writeFileSync(path.join(__dirname, '../players.json'), JSON.stringify(players, null, 2));
 
-        // --- 7. 成功 Embed ---
+        // --- 7. 成功提示 ---
         const successEmbed = new EmbedBuilder()
             .setColor(qInfo.color || 0xFFFFFF)
             .setTitle("⚒️ | 打造成功！")
