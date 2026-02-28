@@ -90,5 +90,6 @@ module.exports = {
             .setFooter({ text: "裝備已自動穿戴。" });
 
         await message.reply({ embeds: [successEmbed] });
-    }
+    module.exports = { qualities, items };
+        }
 };
