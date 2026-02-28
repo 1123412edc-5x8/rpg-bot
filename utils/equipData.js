@@ -1,95 +1,28 @@
-const { qualities, items } = require('../utils/equipData.js'); // 注意路徑
-const { EmbedBuilder } = require('discord.js');
-const fs = require('fs');
-const path = require('path');
-
-module.exports = {
-    name: 'craft',
-    aliases: ['合成', 'hc', 'make'],
-    async execute(message, args, p, players) {
-        // 🚨 安全檢查
-        if (!items) return message.reply("❌ **系統錯誤**：找不到裝備清單 (items)。");
-
-        const clean = (str) => str ? str.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, "").trim() : "";
-
-        // --- 1. 顯示合成表 ---
-        if (!args[0]) {
-            const helpEmbed = new EmbedBuilder()
-                .setColor(0x3498DB)
-                .setTitle("🔨 | 裝備合成工坊")
-                .setDescription("請輸入裝備全名進行製作\n用法：`~hc [裝備名稱]`\n例如：`~hc 精鋼長矛`\n\n**可製作清單：**\n" + 
-                    Object.keys(items).map(name => `🔹 **${name}** (Lv.${items[name].level})`).join('\n'))
-                .setFooter({ text: "請確保材料足夠！" });
-
-            return message.reply({ embeds: [helpEmbed] });
-        }
-
-        // --- 2. 搜尋裝備 ---
-        const targetName = args.join(' '); // 支援有空格的名稱
-        const recipe = items[targetName];
-
-        if (!recipe) {
-            return message.reply(`❌ **找不到配方**：\`${targetName}\`。請輸入完整的裝備名稱！`);
-        }
-
-        // --- 3. 檢查等級與金錢 ---
-        if (p.level < recipe.level) return message.reply(`❌ **等級不足**：製作此裝備需要 Lv.${recipe.level}。`);
-        const cost = recipe.level * 100; // 假設費用是等級x100
-        if (p.money < cost) return message.reply(`❌ **金幣不足**：需要 \`$${cost}\`。`);
-
-        // --- 4. 檢查材料 (智能匹配) ---
-        let missing = [];
-        for (const [mName, needAmount] of Object.entries(recipe.mats)) {
-            const pureMName = clean(mName);
-            const hasAmount = p.inventory[mName] || p.inventory[pureMName] || 0;
-            if (hasAmount < needAmount) {
-                missing.push(`- ${mName} (缺少 ${needAmount - hasAmount})`);
-            }
-        }
-
-        if (missing.length > 0) {
-            return message.reply(`❌ **材料不足**：\n${missing.join('\n')}`);
-        }
-
-        // --- 5. 扣除材料與金幣 ---
-        p.money -= cost;
-        for (const [mName, needAmount] of Object.entries(recipe.mats)) {
-            if (p.inventory[mName] >= needAmount) p.inventory[mName] -= needAmount;
-            else p.inventory[clean(mName)] -= needAmount;
-        }
-
-        // --- 6. 發放裝備 ---
-        const qualityInfo = qualities[recipe.quality] || qualities.White;
-        const part = recipe.type; // weapon, head, armor, boots
-        
-        // 計算屬性 (基礎值 * 品質倍率)
-        const baseStat = recipe.atk || recipe.def || 0;
-        const finalStat = Math.floor(baseStat * qualityInfo.mult);
-
-        p.equipment = p.equipment || {};
-        p.equipment[part] = {
-            name: `${qualityInfo.label} ${targetName}`,
-            stat: finalStat,
-            quality: recipe.quality,
-            plus: 0
-        };
-
-        // 儲存資料
-        players[message.author.id] = p;
-        fs.writeFileSync(path.join(__dirname, '../players.json'), JSON.stringify(players, null, 2));
-
-        // --- 7. 成功 Embed ---
-        const successEmbed = new EmbedBuilder()
-            .setColor(qualityInfo.color)
-            .setTitle("⚒️ | 打造成功！")
-            .setDescription(`你成功製作出了 **${qualityInfo.label} ${targetName}**！`)
-            .addFields(
-                { name: `📊 ${part === 'weapon' ? '攻擊力' : '防禦力'}`, value: `\`+${finalStat}\``, inline: true },
-                { name: "✨ 品質", value: `${qualityInfo.label}`, inline: true }
-            )
-            .setFooter({ text: "裝備已自動穿戴。" });
-
-        await message.reply({ embeds: [successEmbed] });
-    module.exports = { qualities, items };
-        }
+// --- 品質倍率定義 ---
+const qualities = {
+    "White":  { label: "⚪ 普通", mult: 1.0, color: 0xffffff },
+    "Green":  { label: "🟢 優秀", mult: 1.2, color: 0x2ecc71 },
+    "Blue":   { label: "🔵 精良", mult: 1.5, color: 0x3498db },
+    "Purple": { label: "🟣 史詩", mult: 2.2, color: 0x9b59b6 },
+    "Gold":   { label: "🟡 傳說", mult: 3.5, color: 0xf1c40f }
 };
+
+// --- 裝備配方清單 ---
+const items = {
+    "新手的木弓": { level: 5, type: "weapon", atk: 45, quality: "White", mats: { "🪵 乾燥的木頭": 15, "🧶 強韌纖維": 5 } },
+    "精鋼長矛": { level: 25, type: "weapon", atk: 180, quality: "Green", mats: { "🧱 鋼鐵錠": 10, "🐾 野獸利爪": 5, "⛓️ 鐵礦石": 20 } },
+    "幽影獵弓": { level: 55, type: "weapon", atk: 750, quality: "Blue", mats: { "🌲 優質木材": 20, "📜 優質皮革": 10, "🐺 狼人毛皮": 5, "🕸️ 強韌蜘蛛絲": 15 } },
+    "寒冰神矛": { level: 75, type: "weapon", atk: 1600, quality: "Purple", mats: { "🧊 冰河鋼": 15, "🌬️ 寒冰精華": 5, "⚪ 白金礦石": 10, "❄️ 冰晶碎片": 30 } },
+    "焚天滅世弓": { level: 95, type: "weapon", atk: 4200, quality: "Gold", mats: { "🩸 龍血石": 5, "🌿 世界樹嫩枝": 2, "🌌 混沌之魂": 2, "🔥 烈焰精華": 20 } },
+    "廢鐵頭盔": { level: 10, type: "head", def: 20, quality: "White", mats: { "廢鐵渣": 15, "生鏽的齒輪": 5 } },
+    "狼首皮帽": { level: 40, type: "head", def: 120, quality: "Blue", mats: { "🐺 狼人毛皮": 5, "🐾 野獸利爪": 10, "📜 優質皮革": 5 } },
+    "龍晶戰盔": { level: 90, type: "head", def: 550, quality: "Gold", mats: { "🐉 龍鱗碎屑": 5, "🩸 龍血石": 1, "💎 奧利哈鋼": 5 } },
+    "生鏽鐵甲": { level: 15, type: "armor", def: 50, quality: "White", mats: { "⛓️ 鐵礦石": 15, "廢鐵渣": 20 } },
+    "冰河重鎧": { level: 60, type: "armor", def: 450, quality: "Purple", mats: { "🧊 冰河鋼": 20, "⛓️ 白銀錠": 15, "🩹 急救包": 5 } },
+    "混沌神甲": { level: 95, type: "armor", def: 1200, quality: "Gold", mats: { "🌌 混沌之魂": 3, "🐉 龍鱗碎屑": 10, "🧱 鋼鐵錠": 50 } },
+    "新手皮靴": { level: 5, type: "boots", def: 10, quality: "White", mats: { "柔軟的兔皮": 5, "史萊姆黏液": 10 } },
+    "熔岩踏破者": { level: 85, type: "boots", def: 350, quality: "Purple", mats: { "🌋 熔岩殼殘片": 15, "🌑 焦黑岩石": 30, "🔥 烈焰精華": 5 } }
+};
+
+// 🌟 導出資料 (放在檔案最後一行，不要包在任何括號裡)
+module.exports = { qualities, items };
