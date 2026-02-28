@@ -1,0 +1,33 @@
+const { EmbedBuilder } = require('discord.js');
+
+module.exports = {
+    name: 'help',
+        aliases: ['h', '幫助'],
+            async execute(message, args) {
+                    const helpEmbed = new EmbedBuilder()
+                                .setColor(0x5865F2) // Discord 官方藍，看起來最穩
+                                            .setTitle('📖 冒險者系統指令手冊')
+                                                        .setAuthor({ name: 'RPG 系統核心', iconURL: message.client.user.displayAvatarURL() })
+                                                                    .setDescription('這裡列出了所有冒險者必備的指令。前綴使用 `~` 或 `/` 皆可。')
+                                                                                .addFields(
+                                                                                                { name: '✨ 每日必做', value: '`~daily` 簽到領取獎勵', inline: true },
+                                                                                                                { name: '⚔️ 核心玩法', value: '`~ex` 進行探險獲得材料', inline: true },
+                                                                                                                                { name: '📋 角色狀態', value: '`~st` 查看檔案與數值', inline: true },
+                                                                                                                                                
+                                                                                                                                                                { name: '━━━━━━━━━━━━━━━━━━━━━━━━━━', value: '**📦 物資管理系統**' },
+                                                                                                                                                                                
+                                                                                                                                                                                                { name: '🎒 背包', value: '`~bag` 查看所有物品', inline: true },
+                                                                                                                                                                                                                { name: '💊 使用', value: '`~use` 補血或消耗品', inline: true },
+                                                                                                                                                                                                                                { name: '💰 出售', value: '`~sell` 處理多餘材料', inline: true },
+                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                { name: '━━━━━━━━━━━━━━━━━━━━━━━━━━', value: '**⚒️ 裝備工坊**' },
+                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                { name: '🔨 合成', value: '`~craft` 查看配方與製作裝備', inline: false },
+                                                                                                                                                                                                                                                                                                                { name: '💡 幫助', value: '`~help` 顯示此清單', inline: false }
+                                                                                                                                                                                                                                                                                                                            )
+                                                                                                                                                                                                                                                                                                                                        .setFooter({ text: `請求者: ${message.author.username}`, iconURL: message.author.displayAvatarURL() })
+                                                                                                                                                                                                                                                                                                                                                    .setTimestamp();
+
+                                                                                                                                                                                                                                                                                                                                                            await message.reply({ embeds: [helpEmbed] });
+                                                                                                                                                                                                                                                                                                                                                                }
+                                                                                                                                                                                                                                                                                                                                                                };
