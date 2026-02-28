@@ -1,12 +1,16 @@
 const { qualities, tiers, parts, weaponTypes } = require('../utils/equipData.js');
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
+const path = require('path'); // 引入路徑模組
 
 module.exports = {
     name: 'craft',
     aliases: ['合成', 'hc', 'make'],
     async execute(message, args, p, players) {
         
+        // 輔助函數：去除 Emoji 方便比對
+        const clean = (str) => str ? str.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]/gu, "").trim() : "";
+
         // --- 1. 主動顯示合成清單 ---
         if (!args[0]) {
             let recipeList = "";
@@ -20,7 +24,7 @@ module.exports = {
                 .setColor(0x3498DB)
                 .setTitle("🔨 | 裝備合成工坊")
                 .setDescription("請輸入等級與部位進行製作\n用法：`~hc [等級] [部位]`\n例：`~hc 10 劍`、`~hc 30 鞋`\n\n" + recipeList)
-                .setFooter({ text: "部位支援：劍、弓、矛、頭、甲、鞋" });
+                .setFooter({ text: "部位支援：劍、弓、矛、頭盔、護甲、靴子" });
 
             return message.reply({ embeds: [helpEmbed] });
         }
@@ -30,26 +34,22 @@ module.exports = {
         const typeInput = args[1];
 
         if (!lv || !typeInput || !tiers[lv]) {
-            return message.reply("❌ **辨識失敗！** 請輸入正確的等級 (10/30/50/70/90) 與部位。");
+            return message.reply("❌ **辨識失敗！** 請輸入正確的等級 (10/30/50...) 與部位。");
         }
 
         let part = "";
         let type = typeInput;
 
-        const weaponList = ['劍', '弓', '矛'];
-        const headList = ['頭', '頭盔', '頂'];
-        const armorList = ['甲', '護甲', '衣服', '身'];
-        const bootsList = ['鞋', '靴子', '靴', '足'];
-
-        if (weaponList.includes(typeInput)) {
+        // 擴充識別清單
+        if (['劍', '弓', '矛'].includes(typeInput)) {
             part = "weapon";
-        } else if (headList.includes(typeInput)) {
+        } else if (['頭', '頭盔', '頂'].includes(typeInput)) {
             part = "head";
             type = "頭盔";
-        } else if (armorList.includes(typeInput)) {
+        } else if (['甲', '護甲', '衣服', '身'].includes(typeInput)) {
             part = "armor";
             type = "護甲";
-        } else if (bootsList.includes(typeInput)) {
+        } else if (['鞋', '靴子', '靴', '足'].includes(typeInput)) {
             part = "boots";
             type = "靴子";
         }
@@ -59,12 +59,20 @@ module.exports = {
         const tier = tiers[lv];
         const recipeCost = lv * 100;
 
-        // --- 3. 條件檢查 ---
+        // --- 3. 條件檢查 (加入智能匹配) ---
         if (p.level < lv) return message.reply(`❌ **等級不足！** 你需要 Lv.${lv}。`);
         if (p.money < recipeCost) return message.reply(`❌ **金幣不足！** 需要 \`$${recipeCost}\`。`);
         
-        const hasMain = p.inventory[tier.material] || 0;
-        const hasSub = p.inventory[tier.sub] || 0;
+        // 💡 關鍵修復：從背包找東西時，同時找「帶圖示」跟「沒圖示」的名字
+        const findInInv = (name) => {
+            const pure = clean(name);
+            // 優先找原名，找不到找去圖標名，再找不到回傳 0
+            return p.inventory[name] || p.inventory[pure] || 0;
+        };
+
+        const hasMain = findInInv(tier.material);
+        const hasSub = findInInv(tier.sub);
+
         if (hasMain < 10 || hasSub < 5) {
             return message.reply(`❌ **材料不足！** 需要：\n📦 10x \`${tier.material}\` (你有: ${hasMain})\n📦 5x \`${tier.sub}\` (你有: ${hasSub})`);
         }
@@ -83,9 +91,9 @@ module.exports = {
 
         // --- 5. 計算屬性 ---
         const baseValue = lv * 10;
-        const qMult = qualities[finalQual].mult;
+        const qInfo = qualities[finalQual];
         const pWeight = parts[part].weight;
-        let finalStat = Math.floor(baseValue * qMult * pWeight);
+        let finalStat = Math.floor(baseValue * qInfo.mult * pWeight);
 
         let weaponLabel = "";
         if (part === "weapon") {
@@ -96,10 +104,15 @@ module.exports = {
 
         // --- 6. 扣除與發放 ---
         p.money -= recipeCost;
-        p.inventory[tier.material] -= 10;
-        p.inventory[tier.sub] -= 5;
         
-        const qInfo = qualities[finalQual];
+        // 扣除材料邏輯：優先扣除背包裡有的那個鍵名
+        const deduct = (name, amount) => {
+            if (p.inventory[name] >= amount) p.inventory[name] -= amount;
+            else p.inventory[clean(name)] -= amount;
+        };
+        deduct(tier.material, 10);
+        deduct(tier.sub, 5);
+        
         const itemName = `${qInfo.label} ${tier.name}${weaponLabel || parts[part].name}`;
         
         p.equipment = p.equipment || {};
@@ -112,7 +125,7 @@ module.exports = {
 
         // 儲存資料
         players[message.author.id] = p;
-        fs.writeFileSync('./players.json', JSON.stringify(players, null, 2));
+        fs.writeFileSync(path.join(__dirname, '../players.json'), JSON.stringify(players, null, 2));
 
         // --- 7. 成功 Embed ---
         const successEmbed = new EmbedBuilder()
