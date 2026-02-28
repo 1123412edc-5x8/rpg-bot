@@ -1,5 +1,5 @@
 // 🚩 請確認你的資料夾名稱是叫 "工具" 還是 "utils"
-const data = require('../工具/equipData.js'); 
+const data = require('../utils/equipData.js'); 
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
